@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import productRoute from './routes/productRoute.js'
 import userRoute from './routes/userRoute.js'
+import authRoute from './routes/authRoutes.js'
 import xss from 'xss-clean'
 import helmet from 'helmet'
 import cors from 'cors'
@@ -40,6 +41,9 @@ app.use('api/products/', productRoute)
 app.use('/api/users/', userRoute)
 // app.use('/api/orders/', orderRoute)
 // app.use('/api/categories/', categoryRoute)
+
+//refresh token route
+app.use('/api/auth/', authRoute);
 
 //error handling middleware
 app.use((err, req, res, next)=>{
