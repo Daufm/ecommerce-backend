@@ -1,4 +1,5 @@
 import express from "express";
+import crypto from 'crypto'
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
@@ -219,3 +220,67 @@ export const logOut = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+// forgot password controller
+export const forgotPassword = async (req, res) => {
+  try{
+    const { email } = req.body;
+    if(!email){
+      return res.status(400).json({ message: "Email is required" });
+    }
+    const user = await User.findOne({email});
+    if(!user){
+      return res.status(404).json({ 
+        message: "If you are registered, we will send you an email with instructions to reset your password." });
+    }
+    // generate reset token
+    const code = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = code;
+    user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    await user.save();
+
+    // build reset link
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${code}`;
+    // queue email (for now: send directly)
+    const emailHtml = `<p>Hi ${user.name},</p>
+                       <p>You requested a password reset. Click the link below to reset your password:</p>
+                       <a href="${resetLink}">Reset Password</a>
+                       <p>This link expires in 10 minutes. If you did not request this, please ignore this email.</p>`;
+    await SendEmail(email, "Password Reset", emailHtml);
+    res.status(200).json({ message: "if you are registered before, we will send you an email with instructions to reset your password." });
+
+  }
+  catch(err){
+    console.error("Forgot password error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+
+// reset password controller
+export const resetPassword = async(req,res)=>{
+  try{
+    const {token , newPassword} = req.body;
+    if(!token || !newPassword){
+      return res.status(400).json({ message: "Token and new password are required" });
+    }
+    const user = await User.findOne({resetPasswordToken: token, resetPasswordExpires: {$gt: Date.now()}});
+    if(!user){
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+      //hash new password
+      user.passwordHash = await argon2.hash(newPassword, { type: argon2.argon2id });
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+     
+      await SendEmail(user.email, "Password Reset Successful", `<p>Hi ${user.name},</p><p>Your password has been reset successfully.</p>`);
+
+      res.status(200).json({ message: "Password reset successful" });
+  }
+  catch(err){
+    console.error("Reset password error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}

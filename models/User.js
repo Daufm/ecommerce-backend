@@ -31,6 +31,8 @@ const userSchema = new mongoose.Schema({
   roles: { type: [String], default: ["customer"] }, // e.g. ['admin']
   addresses: [addressSchema],
   refreshTokens: [refreshTokenSchema],
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date },
   isEmailVerified: { type: Boolean, default: false },
 }, { timestamps: true });
 
