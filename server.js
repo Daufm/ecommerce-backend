@@ -4,7 +4,6 @@ import dotenv from 'dotenv'
 import productRoute from './routes/productRoute.js'
 import userRoute from './routes/userRoute.js'
 import authRoute from './routes/authRoutes.js'
-import xss from 'xss-clean'
 import helmet from 'helmet'
 import cors from 'cors'
 import rateLimit from 'express-rate-limit'
@@ -20,7 +19,7 @@ app.use(express.urlencoded({ extended: true }))
 // cors for cross origin requests
 app.use(cors())
 //data sanitization against DOS attacks
-app.use(xss())
+
 app.use(helmet())
 app.use(mongoSanitize())
 
@@ -37,7 +36,7 @@ app.get('/' , (req, res)=>{
 })
 
 // Routes
-app.use('api/products/', productRoute)
+app.use('/api/products/', productRoute)
 app.use('/api/users/', userRoute)
 // app.use('/api/orders/', orderRoute)
 // app.use('/api/categories/', categoryRoute)
