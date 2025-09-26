@@ -21,7 +21,15 @@ app.use(cors())
 //data sanitization against DOS attacks
 
 app.use(helmet())
-app.use(mongoSanitize())
+
+//update to use replaceWith option to avoid issues with req.query and req.params
+app.use(mongoSanitize( {
+    onSanitized: ({ req, key }) => {
+      console.warn(`This request[${key}] is sanitized`, req);
+    },
+    replaceWith: '_'
+  }))
+
 
 //rate limiting
 const limiter = rateLimit({
