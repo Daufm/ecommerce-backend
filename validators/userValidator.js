@@ -4,9 +4,9 @@ export const registerSchema = Joi.object({
   name: Joi.string().trim().min(2).max(50).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(8).max(128).required(),
-  phone: Joi.string().pattern(/^[0-9]{10,15}$/).optional(),
+  phone: Joi.string().pattern(/^\+?[0-9]{10,15}$/).optional(),
 
-  address: Joi.object({
+  addresses: Joi.array().items(Joi.object({
     label: Joi.string().optional(),
     name: Joi.string().trim().required(),
     line1: Joi.string().trim().required(),
@@ -16,5 +16,5 @@ export const registerSchema = Joi.object({
     postalCode: Joi.string().trim().required(),
     country: Joi.string().trim().required(),
     phone: Joi.string().trim().optional(),
-  }).optional(),
+  })).optional(),
 });

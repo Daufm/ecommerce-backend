@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
   phone: { type: String, index: true },
   passwordHash: { type: String, required: true },
   roles: { type: [String], default: ["customer"] }, // e.g. ['admin']
-  addresses: [addressSchema],
+  addresses: { type: [addressSchema], default: [] },
   refreshTokens: [refreshTokenSchema],
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },

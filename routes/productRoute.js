@@ -5,8 +5,8 @@ const router = express.Router()
 
 
 // product
-router.get('/' , getProducts)
-router.post('/' , createProduct)
+// router.get('/' , getProducts)
+// router.post('/' , createProduct)
 
 
 

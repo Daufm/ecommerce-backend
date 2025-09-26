@@ -4,13 +4,18 @@ import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import SendEmail from "../utils/SendEmail.js";
+import dotenv from "dotenv"
+dotenv.config();
 
 
 // const router = express.Router();
 // user registration controller
 export const createUser = async (req, res) => {
   try {
-    const { name, email, password, address} = req.body;
+    const { name, email, password, addresses} = req.body;
+     
+    console.log("Incoming request body:", req.body);
+
     // validate input(handle more in frontend)
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Name, email and password are required" });
@@ -27,21 +32,26 @@ export const createUser = async (req, res) => {
 
     // create user
     const newUser = new User({ name, email, passwordHash });
-     if (address) {
-        newUser.addresses.push({
-            label: address.label || "Home",
-            name: address.name,
-            line1: address.line1,
-            line2: address.line2,
-            city: address.city,
-            state: address.state,
-            postalCode: address.postalCode,
-            country: address.country,
-            phone: address.phone,
+    // Support both single address and multiple addresses
+      if (addresses && Array.isArray(addresses)) {
+        addresses.forEach(addr => {
+          newUser.addresses.push({
+              label: addr.label || "Home",
+              name: addr.name,
+              line1: addr.line1,
+              line2: addr.line2 || "",
+              city: addr.city,
+              state: addr.state || "",
+              postalCode: addr.postalCode,
+              country: addr.country,
+              phone: addr.phone || ""
+          });
         });
-        }
+         
+      } 
 
     await newUser.save();
+    console.log("Saved user:", newUser);
 
     // generate verification token
     const payload = { email: newUser.email, id: newUser._id };
@@ -50,7 +60,8 @@ export const createUser = async (req, res) => {
     });
 
     // build verification link
-    const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+    //i used backend url because i want to create a route in backend to verify the email(change it on frontend later) 
+    const verificationLink = `${process.env.BACKEND_URL}/api/users/verify-email?token=${verificationToken}`;
 
     // queue email (for now: send directly)
     const emailHtml = `<p>Hi ${name},</p>
@@ -63,6 +74,7 @@ export const createUser = async (req, res) => {
     res.status(201).json({
       message: "User created successfully. Please check your email to verify.",
       user: { id: newUser._id, name: newUser.name, email: newUser.email },
+      token: verificationToken // for testing purposes only
     });
   } catch (error) {
     console.error("Error creating user:", error);
@@ -142,7 +154,7 @@ export const signIn = async (req, res) => {
 export const verifyEmail = async (req, res) => {
   
   try {
-    const { token } = req.body;
+    const { token } = req.query;
     if (!token) {
       return res.status(400).json({ message: "Verification token is required" });
     }
@@ -240,8 +252,8 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
     await user.save();
 
-    // build reset link
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${code}`;
+    // build reset link(i used backend url because i want to create a route in backend to reset the password(change it on frontend later))
+    const resetLink = `${process.env.BACKEND_URL}/api/users/reset-password?token=${code}`;
     // queue email (for now: send directly)
     const emailHtml = `<p>Hi ${user.name},</p>
                        <p>You requested a password reset. Click the link below to reset your password:</p>
@@ -261,7 +273,10 @@ export const forgotPassword = async (req, res) => {
 // reset password controller
 export const resetPassword = async(req,res)=>{
   try{
-    const {token , newPassword} = req.body;
+    const { newPassword} = req.body;
+    // Get token from URL parameters
+    const {token} = req.query;
+
     if(!token || !newPassword){
       return res.status(400).json({ message: "Token and new password are required" });
     }
