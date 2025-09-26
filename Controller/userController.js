@@ -284,3 +284,18 @@ export const resetPassword = async(req,res)=>{
     res.status(500).json({ message: "Internal server error" });
   }
 }
+
+// get user profile controller
+export const getUserProfile = async(req,res)=>{
+  try{
+    const userId = req.user.id;
+    const user = await User.findById(userId).select('-passwordHash -refreshTokens -resetPasswordToken -resetPasswordExpires');
+    if(!user){
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ user });
+  } catch(err){
+    console.error("Get user profile error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
