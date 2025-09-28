@@ -1,14 +1,12 @@
-import express from 'express'
-import Product from '../models/Products.js'
 
-const router = express.Router()
+import express from "express";
+import { authenticateToken } from "../middleware/authMiddleware.js";
+import { adminAuthenticate } from "../middlewares/adminAuth.js";
+import { createProduct } from "../controllers/productController.js";
 
+const router = express.Router();
 
-// product
-// router.get('/' , getProducts)
-// router.post('/' , createProduct)
+// Create product (admin only)
+router.post("/", authenticateToken, adminAuthenticate, createProduct);
 
-
-
-
-export default router
+export default router;
