@@ -10,6 +10,12 @@ const variantSchema = new mongoose.Schema({
   stock: { type: Number, default: 0 }
 }, { _id: false });
 
+// Reviews subdocument schema
+const reviewSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  rating: { type: Number, min: 1, max: 5 },
+  comment: String
+}, { _id: false });
 
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -21,8 +27,9 @@ const productSchema = new mongoose.Schema({
   variants: { type: [variantSchema], default: [] }, // different versions of the product
   price: { type: Number, required: true }, // legacy main price (or compute from variants)
   isActive: { type: Boolean, default: true, index: true },
-  rating: { type: Number, default: 0 },
-  reviewsCount: { type: Number, default: 0 }, // number of reviews
+  reviews: { type: [reviewSchema], default: [] }, // user reviews
+  reviewsCount: { type: Number, default: 0 },
+  rating: { type: Number, default: 0 }, // average rating
   meta: mongoose.Schema.Types.Mixed  // for any extra metadata
 }, { timestamps: true });
 

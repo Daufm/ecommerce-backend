@@ -2,7 +2,7 @@
 import express from "express";
 import { authenticateToken } from "../middleware/authMiddleware.js";
 import { adminAuthenticate } from "../middlewares/adminAuth.js";
-import {createProduct, getProducts, getProductBySlug } from "../Controller/productController.js";
+import {createProduct, getProducts, getProductReviews,addProductReview, getProductBySlug } from "../Controller/productController.js";
 
 const router = express.Router();
 
@@ -18,5 +18,11 @@ router.get("/", getProducts);
 
 // Get single product by slug (public)
 router.get("/:slug", getProductBySlug);
+
+// Add product review (authenticated users)
+router.post('/slug/:slug/reviews', authenticateToken, addProductReview);
+
+// Get product reviews
+router.get('/slug/:slug/reviews', getProductReviews);
 
 export default router;

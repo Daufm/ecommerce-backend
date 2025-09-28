@@ -1,7 +1,7 @@
 import Product from '../models/Products.js'
 
 
-
+// Create new product (admin only)
 export const createProduct = async (req, res) => {
    
     // Generate base slug from product name
@@ -133,7 +133,6 @@ export const getProducts = async (req, res) => {
 
    
 // Get single product by  slug
-
 export const getProductBySlug = async (req,res)=>{
     try{
         const {slug} = req.params
@@ -205,3 +204,56 @@ export const deleteProduct = async (req ,res)=>{
   }
 }
        
+
+// Add product review
+export const addProductReview = async (req, res) => {
+  try{
+    const { slug } = req.params;
+    const { rating, comment } = req.body;
+    const userId = req.user.id; // from auth middleware
+
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ message: "Rating must be between 1 and 5" });
+    }
+    if (!comment || comment.length < 3) {
+      return res.status(400).json({ message: "Comment is too short." });
+    }
+
+     const product = await Product.findOne({slug, isActive:true});
+      if(!product){
+          return res.status(404).json({message:"Product not found"});
+      }
+    // Check if user already reviewed
+    const alreadyReviewed = product.reviews.find(r=> r.user.toString()=== userId);
+
+    if(alreadyReviewed){
+        return res.status(400).json({message:"Product already reviewed"});
+    }
+
+    product.reviews.push({ user: userId, rating, comment });
+    product.reviewsCount = product.reviews.length;
+    product.rating = product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.reviews.length;
+    await product.save();
+
+    res.status(201).json({ message: "Review added successfully" });
+  }catch(error){
+      console.error("Add Product Review Error:", error);
+      res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Get product reviews
+export  const  getProductReviews = async (req, res)=>{
+  try{
+    const {slug} = req.params
+    //populate to get user name from user id
+    const product = await Product.findOne({slug, isActive:true}).populate("reviews.user", "name");
+    if(!product){
+      return res.status(404).json({message:"Product not found"});
+    }
+    res.status(200).json({reviews: product.reviews});
+  }catch(error){
+    console.error("Get Product Reviews Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
