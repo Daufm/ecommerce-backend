@@ -132,3 +132,18 @@ export const getProducts = async (req, res) => {
 };
 
    
+// Get single product by  slug
+
+export const getProductBySlug = async (req,res)=>{
+    try{
+        const {slug} = req.params
+        const product = await Product.findOne({slug:slug, isActive:true})
+        if(!product){
+            return res.status(404).json({message:"Product not found"})
+        }
+        res.status(200).json({product})
+    }catch(error){
+        console.error("Get Product By Slug Error:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
