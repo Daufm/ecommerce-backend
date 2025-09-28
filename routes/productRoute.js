@@ -7,7 +7,11 @@ import {createProduct, getProducts, getProductBySlug } from "../Controller/produ
 const router = express.Router();
 
 // Create product (admin only)
-router.post("/", authenticateToken, adminAuthenticate, createProduct);
+router.post("/",authenticateToken, adminAuthenticate, createProduct);
+//update product (admin only)
+router.put("/slug/:slug", authenticateToken, adminAuthenticate, updateProduct);
+//delete product (admin only)
+router.delete("/slug/:slug", authenticateToken, adminAuthenticate, deleteProduct);
 
 // Get all products (public)
 router.get("/", getProducts);

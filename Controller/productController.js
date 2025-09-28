@@ -148,3 +148,60 @@ export const getProductBySlug = async (req,res)=>{
     }
 };
 
+// Update product by slug
+export const updateProduct = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const updates = req.body;
+    if (updates.name) {
+      // Generate new slug if name is updated
+      let baseSlug = updates.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+      let slug = baseSlug;
+      let counter = 1;
+
+      while (await Product.findOne({ slug: slug })) {
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+
+      updates.slug = slug;
+    }
+
+    const updatedProduct = await Product.findOneAndUpdate({ slug }, updates, { new: true });
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.status(200).json({
+      message: "Product updated successfully",
+      product: updatedProduct
+    });
+  } catch (error) {
+    console.error("Update Product Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+// Delete product by slug (soft delete by setting isActive to false)
+export const deleteProduct = async (req ,res)=>{
+  try{
+    const {slug} = req.params
+    const deletedProduct = await Product.findOneAndUpdate({slug}, {isActive:false}, {new:true})
+     
+    if(!deletedProduct){
+      return res.status(400).json({message:"Product not found"})
+    }
+
+    res.status(200).json(
+      {message:"Product deleted successfully",
+        product: deletedProduct
+      }
+    )
+  } catch (error) {
+    console.error("Delete Product Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+       
