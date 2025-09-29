@@ -1,8 +1,14 @@
 
 import express from "express";
 import { authenticateToken } from "../middleware/authMiddleware.js";
-import { adminAuthenticate } from "../middlewares/adminAuth.js";
-import {createProduct, getProducts, getProductReviews,addProductReview, getProductBySlug } from "../Controller/productController.js";
+import { adminAuthenticate } from "../middleware/adminAuthticate.js";
+import {createProduct,
+        getProducts,
+       updateProduct,
+       deleteProduct,
+        getProductReviews,
+        addProductReview, 
+        getProductBySlug ,getProductsByCategory} from "../Controller/productController.js";
 
 const router = express.Router();
 
@@ -24,5 +30,8 @@ router.post('/slug/:slug/reviews', authenticateToken, addProductReview);
 
 // Get product reviews
 router.get('/slug/:slug/reviews', getProductReviews);
+
+//get by catagory
+router.get("/category/:category", getProductsByCategory);
 
 export default router;

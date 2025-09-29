@@ -37,7 +37,7 @@ export const refreshToken = async (req, res) => {
     }
 
     // Verify token hash
-    const isValid = await argon2.verify(storedToken.tokenHash, refreshToken);
+    const isValid = await argon2.verify(storedToken.tokenHash, refreshToken , { type: argon2.argon2id });
     if (!isValid) {
       // 🚨 Possible reuse attack → clear all tokens
       user.refreshTokens = [];

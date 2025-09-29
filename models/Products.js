@@ -1,4 +1,6 @@
 // src/models/Product.js
+import pkg from 'joi';
+const { types } = pkg;
 import mongoose from "mongoose";
 
 // Subdocument schema for product variants
@@ -23,7 +25,7 @@ const productSchema = new mongoose.Schema({
   description: String,
   categories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category", index: true }],
   images: [String], // s3 urls
-  brand: { type: mongoose.Schema.Types.ObjectId, ref: "Brand", index: true },
+  brand: { type: String, index: true },
   variants: { type: [variantSchema], default: [] }, // different versions of the product
   price: { type: Number, required: true }, // legacy main price (or compute from variants)
   isActive: { type: Boolean, default: true, index: true },
