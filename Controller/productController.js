@@ -259,3 +259,15 @@ export  const  getProductReviews = async (req, res)=>{
   }
 }
 
+// Get products by category
+export const getProductsByCategory = async (req ,res)=>{
+  try{
+    const {category} = req.params
+
+    const products = await Product.find({category: category, isActive: true})
+    res.status(200).json({products})
+  }catch(error){
+    console.error("Get Products by Category Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
