@@ -242,6 +242,7 @@ export const addProductReview = async (req, res) => {
   }
 };
 
+
 // Get product reviews
 export  const  getProductReviews = async (req, res)=>{
   try{
@@ -257,3 +258,4 @@ export  const  getProductReviews = async (req, res)=>{
     res.status(500).json({ message: "Internal server error" });
   }
 }
+
