@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import productRoute from './routes/productRoute.js'
 import userRoute from './routes/userRoute.js'
 import authRoute from './routes/authRoutes.js'
+import categoryRoute from './routes/categoryRoute.js'
 import helmet from 'helmet'
 import cors from 'cors'
 import rateLimit from 'express-rate-limit'
@@ -47,7 +48,7 @@ app.get('/' , (req, res)=>{
 app.use('/api/products/', productRoute)
 app.use('/api/users/', userRoute)
 // app.use('/api/orders/', orderRoute)
-// app.use('/api/categories/', categoryRoute)
+app.use('/api/categories', categoryRoute)
 
 //refresh token route
 app.use('/api/auth/', authRoute);
