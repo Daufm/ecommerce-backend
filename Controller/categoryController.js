@@ -5,6 +5,14 @@ import Category from "../models/catagory.js";
 // Create new category (admin only)
 export const createCategory = async (req, res) => {
   try {
+    //check admin
+    if (!req.user || !req.user.roles.includes("admin")) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied"
+      });
+    }
+
     const { name, parent = null, image = null } = req.body;
 
     if (!name) {
@@ -17,6 +25,7 @@ export const createCategory = async (req, res) => {
     let counter = 1;
 
     // Ensure slug is unique
+
     while (await Category.findOne({ slug })) {
       slug = `${baseSlug}-${counter}`;
       counter++;
@@ -45,7 +54,7 @@ export const createCategory = async (req, res) => {
 // Get all categories
 export const getAllCategories = async (req, res)=>{
     try{
-        const categories = await Category.find().populate('parent', 'name slug');
+        const categories = await Category.find({isActive:true}).populate('parent', 'name slug');
         res.status(200).json({
             success: true,
             data: categories

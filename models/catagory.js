@@ -32,6 +32,6 @@ const categorySchema = new mongoose.Schema(
 );
 
 // Add text index for search
-categorySchema.index({ name: "text", slug: "text", description: "text" });
+categorySchema.index({ name: "text", slug: "text" });
 
 export default mongoose.model("Category", categorySchema);
