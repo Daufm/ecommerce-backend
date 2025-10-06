@@ -1,12 +1,12 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import User from "../Model/User.js";
+import User from "../models/User.js";
 
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "api/auth/google/callback"
+    callbackURL: process.env.GOOGLE_CALLBACK_URL || `${process.env.BACKEND_URL}/api/auth/google/callback`
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
@@ -22,7 +22,7 @@ passport.use(new GoogleStrategy({
           roles : ["customer"],
           isEmailVerified: true,
           provider: "google",
-          
+
         });
         await user.save();
       }
