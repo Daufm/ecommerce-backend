@@ -15,7 +15,7 @@ router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' , session: false }),
   (req, res) => {
     // Successful authentication
-    const token = jwt.sign({ id: req.user._id, roles: req.user.roles }, process.env.JWT_SECRET, { expiresIn: '20m' });
+    const token = jwt.sign({ id: req.user._id, roles: req.user.roles }, process.env.JWT_EMAIL_SECRET, { expiresIn: '20m' });
     // You can set the token in a cookie or return it in the response
     res.cookie('jwt', 
               token, 

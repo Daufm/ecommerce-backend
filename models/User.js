@@ -14,6 +14,7 @@ const addressSchema = new mongoose.Schema({
   phone: String
 }, { _id: false });
 
+
 // Subdocument schema for refresh tokens
 const refreshTokenSchema = new mongoose.Schema({
   tokenHash: String,       // store hashed refresh token for rotation
@@ -27,7 +28,10 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true, index: true },
   email: { type: String, required: true, unique: true, index: true },
   phone: { type: String, index: true },
-  passwordHash: { type: String, required: true },
+  passwordHash: { type: String, required: function() { return this.provider === "local"; } },
+  provider: { type: String, default: "local" }, // "local", "google", "facebook"
+  googleId : { type: String, index: true },
+  facebookId : { type: String, index: true },
   roles: { type: [String], default: ["customer"] }, // e.g. ['admin']
   addresses: { type: [addressSchema], default: [] },
   refreshTokens: [refreshTokenSchema],

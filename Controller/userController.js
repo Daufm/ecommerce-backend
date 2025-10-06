@@ -87,6 +87,9 @@ export const createUser = async (req, res) => {
   }
 };
 
+//create  user with google oauth 2
+
+
 
 // login controller
 export const signIn = async (req, res) => {
