@@ -8,7 +8,9 @@ import categoryRoute from './routes/categoryRoute.js'
 import helmet from 'helmet'
 import cors from 'cors'
 import rateLimit from 'express-rate-limit'
-import mongoSanitize from 'express-mongo-sanitize'
+import passport from "passport"
+import "./config/passport.js"
+
 
 
 dotenv.config()
@@ -20,6 +22,9 @@ app.use(express.urlencoded({ extended: true }))
 // cors for cross origin requests
 app.use(cors())
 //data sanitization against DOS attacks
+
+app.use(passport.initialize());
+
 
 app.use(helmet())
 
